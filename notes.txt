@@ -1,0 +1,17 @@
+'\226\151\137' => potion symbol
+'\194' => ' '
+'\226\128\166\32\160' => '...'	<- but doesn't seem to be working ...
+
+Cornucopia cards to remove:
+type : '- Prize'
+
+Alchemy cards to remove:
+Potion
+
+Dark Ages cards to remove:
+... star cost cards
+... type : '- Ruins'
+... type : '- Knight'
+... type : '- Shelter'
+Shelters
+Ruins

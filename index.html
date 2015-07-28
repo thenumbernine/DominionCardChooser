@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Dominion Game Manager</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" text="text/css" href="jquery.mobile-1.2.0.css"/>
+		<link rel="stylesheet" text="text/css" href="style.css"/>
+
+		<script type="text/javascript">
+
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-17312646-3']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();
+
+		</script>
+		
+		<script type="text/javascript" src="jquery-1.8.2.min.js"></script>
+		<script type="text/javascript">
+$(document).bind('mobileinit', function() {
+	$.mobile.selectmenu.prototype.options.nativeMenu = false;
+	$.mobile.listview.prototype.options.dividerTheme = 'a';
+	$.mobile.hashListeningEnabled = false;			//select box change thing does url change
+	$.mobile.changePage.defaults.changeHash = false;	//clicking a button does a url change
+	$.mobile.changePage.defaults.transition = 'flip';
+	$.mobile.changePage.defaults.allowSamePageTransition = true;
+});
+		</script>
+		<script type="text/javascript" src="jquery.mobile-1.2.0.js"></script>
+		<script type="text/javascript" src="dominion.js"></script>
+		<script type="text/javascript" src="main.js"></script>
+
+	</head>
+	<body>
+		<div id='deckpage' data-role='page'>
+			<div data-role='header'><h1>Dominion</h1></div>
+			<div data-role='content'>
+				<div data-role='fieldcontain'>
+					<label for='count'>Count</label>
+					<input type='text' value='10' id='count'/>
+				</div>
+				<a id='showresultsbutton' href='#' data-role='button' onclick='showresults()' style='display:none'>Show Results</a>
+				<a href='#' data-role='button' onclick='go()'>New Roll</a>
+				<div id='deckgrid'>
+				</div>
+				<a href='#' data-role='button' onclick='reset()'>Reset</a>
+			</div>
+			<div data-role='footer'>
+				<a href='mailto:christopher.e.moore@gmail.com'>Comments?</a>
+				<button id='deck-help'>Help?</button>
+				<span style='padding-left:20px'></span>
+				<input type='text' value='10' id='rollSides1' style='display:inline; width:50px'/>
+				<a onclick='roll(1)'>Roll</a>
+				<input type='text' value='10' id='rollResult1' style='display:inline; width:50px'/>
+				<!-- span class='random-dot-org'>Dice powered by <a href='http://www.random.org'>RANDOM.ORG</a></span -->
+			</div>
+		</div>
+
+		<div id='resultspage' data-role='page'>
+			<div data-role='header'><h1>Results</h1></div>
+			<div id='resultscontent' data-role='content'>
+			</div>
+			<div data-role='footer'>
+				<a href='mailto:christopher.e.moore@gmail.com'>Comments?</a>
+				<button id='results-help'>Help?</button>
+				<span style='padding-left:20px'></span>
+				<input type='text' value='10' id='rollSides2' style='display:inline; width:50px'/>
+				<a onclick='roll(2)'>Roll</a>
+				<input type='text' value='10' id='rollResult2' style='display:inline; width:50px'/>
+				<!-- span class='random-dot-org'>Dice powered by <a href='http://www.random.org'>RANDOM.ORG</a></span -->
+			</div>
+		</div>
+	
+		<div id='helppage' data-role='page'>
+			<h3>Main Page:</h3><br>
+			<b>Count</b> - Specifies the number of cards to randomly choose.<br>
+			<b>Show Results</b> - Returns to the most recent list of cards that have been chosen.<br>
+			<b>New Roll</b> - Chooses <i>Count</i> cards at random and goes to the <i>Roll Page</i>.<br>
+			<b>(Various Editions)</b> - Checkboxes to select which editons to choose random cards from.<br>
+			<b>...</b> - Goes to the <i>Edition Page</i>, which allows you to edit which cards from each edition will be chosen at random.<br>
+			<b>Reset</b> - Enables all cards for all editions.<br>
+			<b>Comments?</b> - Write me an email!<b>
+			<hr>
+			
+			<h3>Edition Page</h3><br>
+			<b>Check All</b> - Enables all cards for this particular edition.<b>
+			<b>(Various Cards)</b> - Specifies whether or not this card will be considered when choosing random cards.<br>
+			<b>Done</b> - Returns to the <i>Main Page</i>.<b>
+			<hr>
+
+			<h3>Roll Page</h3><br>
+			<i>For Each Card:</i><br>
+			<b>Strike</b> - Remove this card, and remove it from the <i>Edition Page</i> list of possible chosen cards for subsequent rolls.<b>
+			<b>Veto</b> - Remove this card, yet leave it enabled for subsequent rolls.<br>
+			<b>Reroll</b> - Remove this card, leave it enabled for subsequent rolls, and replace it with another card at random.<br>
+			<br>
+			<b>Roll Again</b> - Removes all cards, leaves them enabled for subsequent rolls, chooses as many new cards at random.<br>
+			<b>Add Card</b> - Adds a new card chosen at random.<br>
+			<b>Strike All</b> - Removes all cards, removes them from subsequent rolls.<br>
+			<b>Back</b> - Returns to the <i>Main Page</i>.  The current cards will be remembered.<br>
+		
+			<button id='help-back'>Back</button><br>
+		</div>
+	</body>
+</html>
