@@ -1,18 +1,18 @@
 function createCookie(name,value,days) {
 	if (days) {
-		var date = new Date();
+		let date = new Date();
 		date.setTime(date.getTime()+(days*24*60*60*1000));
-		var expires = "; expires="+date.toGMTString();
+		let expires = "; expires="+date.toGMTString();
 	}
-	else var expires = "";
+	else let expires = "";
 	document.cookie = name+"="+value+expires+"; path=/";
 }
 
 function readCookie(name) {
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
-		var c = ca[i];
+	let nameEQ = name + "=";
+	let ca = document.cookie.split(';');
+	for(let i=0;i < ca.length;i++) {
+		let c = ca[i];
 		while (c.charAt(0)==' ') c = c.substring(1,c.length);
 		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
 	}
@@ -24,8 +24,8 @@ function eraseCookie(name) {
 }
 
 function updateStrike(cardIndex,j) {
-	var id = 'deck'+cardIndex+'card'+j;
-	var strikeName = 'strike-'+cardIndex+'-'+j;
+	let id = 'deck'+cardIndex+'card'+j;
+	let strikeName = 'strike-'+cardIndex+'-'+j;
 	if ($('#'+id).attr('checked') == 'checked') {
 		eraseCookie(strikeName);
 	} else {
@@ -33,22 +33,22 @@ function updateStrike(cardIndex,j) {
 	}
 }
 
-var deckCheckboxes = [];
+let deckCheckboxes = [];
 
-var cardsUsed;
-var cardsLeft;
+let cardsUsed;
+let cardsLeft;
 	
 function pickRandom() {
-	var i = parseInt(Math.random() * cardsLeft.length);
-	var card = cardsLeft.splice(i, 1)[0];
+	let i = parseInt(Math.random() * cardsLeft.length);
+	let card = cardsLeft.splice(i, 1)[0];
 	cardsUsed.push(card);
 	updateHandCookies();
 	return card;
 }
 
 function cardComparator(a,b) {
-	var ai = decks.indexOf(a.deck);
-	var bi = decks.indexOf(b.deck);
+	let ai = decks.indexOf(a.deck);
+	let bi = decks.indexOf(b.deck);
 	if (ai < bi) return -1;
 	if (ai > bi) return 1;
 	if (a.name < b.name) return -1;
@@ -60,15 +60,15 @@ function updateHandCookies() {
 	createCookie('hand-count', cardsUsed.length);
 	$.each(cardsUsed, function(i,card) {
 		//get the card's index of the deck and the card's index in the deck
-		var deckIndex = decks.indexOf(card.deck);
-		var cardIndex = card.deck.cards.indexOf(card);
+		let deckIndex = decks.indexOf(card.deck);
+		let cardIndex = card.deck.cards.indexOf(card);
 		createCookie('hand-'+i, deckIndex+'-'+cardIndex);
 	});
 }
 
 function buildCardsFromDecks() {
 	$('#showresultsbutton').css('display', 'block');
-	var allCards = [];
+	let allCards = [];
 	$.each(decks, function(i,deck) {
 		if (deckCheckboxes[i].attr('checked') == 'checked') {
 			$.each(deck.cards, function(j,card) {
@@ -86,7 +86,7 @@ function buildCardsFromDecks() {
 }
 
 function go() {
-	var oneIsChecked = false;
+	let oneIsChecked = false;
 	$.each(decks, function(i,deck) {
 		if (deckCheckboxes[i].attr('checked') == 'checked') {
 			oneIsChecked = true;
@@ -100,7 +100,7 @@ function go() {
 	buildCardsFromDecks();
 	updateHandCookies();
 
-	var count = parseInt($('#count').val());
+	let count = parseInt($('#count').val());
 	while (cardsUsed.length < count && cardsLeft.length > 0) {
 		pickRandom();
 	}
@@ -110,44 +110,44 @@ function go() {
 	redraw();
 }
 
-var fadeCard;
+let fadeCard;
 function redraw() {
 	cardsUsed.sort(cardComparator);
 	updateHandCookies();
 	
-	var content = $('#resultscontent');
+	let content = $('#resultscontent');
 	content.empty();
 
-	var lastDeck = undefined;
+	let lastDeck = undefined;
 	$.each(cardsUsed, function(i,card) {
 		if (card.deck !== lastDeck) {
 			lastDeck = card.deck;
 			
 			//dynamic list dividers and headers not working...
-			/*var a = $('<a>', {
+			/*let a = $('<a>', {
 				href:'#',
 				text:card.deck.name
 			}).buttonMarkup({theme:'b'})
 				.appendTo(content);
 			*/
 
-			var div = $('<div>').css('text-align', 'center').addClass('ui-bar, ui-bar-b').appendTo(content);
+			let div = $('<div>').css('text-align', 'center').addClass('ui-bar, ui-bar-b').appendTo(content);
 			$('<h2>').text(card.deck.name).appendTo(div);
 		}
 	
-		var div = $('<div>').attr('data-role', 'header').addClass('ui-bar').appendTo(content);
+		let div = $('<div>').attr('data-role', 'header').addClass('ui-bar').appendTo(content);
 		if (card == fadeCard) {
 			div.fadeTo(0,0);
 		}
 
-		var a = $('<a>', {
+		let a = $('<a>', {
 			href:'#',
 			text:'Strike',
 			css:{cssFloat:'left'},
 			click:function() {
-				var deckIndex = decks.indexOf(card.deck);
-				var cardIndex = card.deck.cards.indexOf(card);
-				var id = 'deck'+deckIndex+'card'+cardIndex;
+				let deckIndex = decks.indexOf(card.deck);
+				let cardIndex = card.deck.cards.indexOf(card);
+				let id = 'deck'+deckIndex+'card'+cardIndex;
 				$('#'+id).attr('checked', false).checkboxradio().checkboxradio('refresh');
 				updateStrike(deckIndex,cardIndex);
 				cardsUsed.splice(i,1);
@@ -159,7 +159,7 @@ function redraw() {
 			.button()
 			.appendTo(div);
 
-		var a = $('<a>', {
+		let a = $('<a>', {
 			href:'#',
 			text:'Veto',
 			css:{cssFloat:'left'},
@@ -175,7 +175,7 @@ function redraw() {
 			.button()
 			.appendTo(div);
 	
-		var a = $('<a>', {
+		let a = $('<a>', {
 			href:'#',
 			text:'Reroll',
 			css:{cssFloat:'left'},
@@ -200,7 +200,7 @@ function redraw() {
 		if (card == fadeCard) { div.fadeTo(300, 1); }
 	});
 	
-	var a = $('<a>', {
+	let a = $('<a>', {
 		href:'#',
 		text:'Roll Again',
 		click:function() {
@@ -208,7 +208,7 @@ function redraw() {
 		}
 	}).attr('data-role', 'button').button().appendTo(content);
 	
-	var a = $('<a>', {
+	let a = $('<a>', {
 		href:'#',
 		text:'Add Card',
 		click:function() {
@@ -217,14 +217,14 @@ function redraw() {
 		}
 	}).attr('data-role', 'button').button().appendTo(content);
 	
-	var a = $('<a>', {
+	let a = $('<a>', {
 		href:'#',
 		text:'Strike All',
 		click:function() {
 			$.each(cardsUsed, function(i,card) {
-				var deckIndex = decks.indexOf(card.deck);
-				var cardIndex = card.deck.cards.indexOf(card);
-				var id = 'deck'+deckIndex+'card'+cardIndex;
+				let deckIndex = decks.indexOf(card.deck);
+				let cardIndex = card.deck.cards.indexOf(card);
+				let id = 'deck'+deckIndex+'card'+cardIndex;
 				$('#'+id).attr('checked', false).checkboxradio().checkboxradio('refresh');
 				updateStrike(deckIndex, cardIndex);
 			});
@@ -232,7 +232,7 @@ function redraw() {
 		}
 	}).attr('data-role', 'button').button().appendTo(content);
 	
-	var a = $('<a>', {
+	let a = $('<a>', {
 		href:'#',
 		text:'Back',
 		click:function() {
@@ -250,7 +250,7 @@ function reset() {
 	updateHandCookies();
 	$.each(decks, function(deckIndex, deck) {
 		$.each(deck.cards, function(cardIndex, card) {
-			var id = 'deck'+deckIndex+'card'+cardIndex;
+			let id = 'deck'+deckIndex+'card'+cardIndex;
 			$('#'+id).attr('checked', 'checked').checkboxradio().checkboxradio('refresh');
 			updateStrike(deckIndex, cardIndex);
 		});
@@ -260,10 +260,10 @@ function reset() {
 
 function init() {
 	(function(){
-		var helpback = 'deckpage';
-		var helpbacks = ['deckpage', 'resultspage'];
+		let helpback = 'deckpage';
+		let helpbacks = ['deckpage', 'resultspage'];
 		$.each(['#deck-help', '#results-help'], function(i,id) {
-			var _back = helpbacks[i];
+			let _back = helpbacks[i];
 			$(id).click(function() {
 				$.mobile.changePage('#helppage');
 				helpback = _back;
@@ -274,16 +274,16 @@ function init() {
 		});
 	})();
 
-	var deckgrid = $('#deckgrid');
+	let deckgrid = $('#deckgrid');
 
-	var initialized = readCookie('initialized');
+	let initialized = readCookie('initialized');
 	createCookie('initialized', '1');
 
 	$('#count')
 		.on('input', function() {
 			createCookie('count', $('#count').val());
 		});
-	var count = readCookie('count');
+	let count = readCookie('count');
 	if (count != null) {
 		$('#count').val(count);
 	}
@@ -299,16 +299,16 @@ function init() {
 	$.each(decks, function(i,deck) {
 		//page
 
-		var page = $('<div>', {id:'deck'+i})
+		let page = $('<div>', {id:'deck'+i})
 			.attr('data-role', 'page')
 			.appendTo(document.body);
 	
-		var header = $('<div>').attr('data-role', 'header').appendTo(page);
+		let header = $('<div>').attr('data-role', 'header').appendTo(page);
 		$('<h1>', {text:deck.name}).appendTo(header);
 		
-		var content = $('<div>').attr('data-role', 'content').appendTo(page);
+		let content = $('<div>').attr('data-role', 'content').appendTo(page);
 
-		var a = $('<a>', {
+		let a = $('<a>', {
 			href:'#',
 			text:'Check All',
 			click:function() {
@@ -321,18 +321,18 @@ function init() {
 		
 		
 		$.each(deck.cards, function(j,card) {
-			var fieldcontain = $('<div>').attr('data-role', 'fieldcontain').appendTo(content);
-			var controlgroup = $('<div>').attr('data-role', 'controlgroup').appendTo(fieldcontain);
-			var id = 'deck'+i+'card'+j;
-			var strikeName = 'strike-'+i+'-'+j;
-			var args = {
+			let fieldcontain = $('<div>').attr('data-role', 'fieldcontain').appendTo(content);
+			let controlgroup = $('<div>').attr('data-role', 'controlgroup').appendTo(fieldcontain);
+			let id = 'deck'+i+'card'+j;
+			let strikeName = 'strike-'+i+'-'+j;
+			let args = {
 				id:id,
 				type:'checkbox',
 				change:function() { updateStrike(i,j); }
 			};
 			if (readCookie(strikeName) === null) args.checked = 'checked'; 
-			var input = $('<input>', args).appendTo(controlgroup);
-			var label = $('<label>', {text:card.name}).attr('for', id).appendTo(controlgroup);
+			let input = $('<input>', args).appendTo(controlgroup);
+			let label = $('<label>', {text:card.name}).attr('for', id).appendTo(controlgroup);
 		});
 
 		$('<a>', {
@@ -345,19 +345,19 @@ function init() {
 
 		//list
 	
-		var grid = $('<div>').addClass('ui-grid-a').appendTo(deckgrid);
+		let grid = $('<div>').addClass('ui-grid-a').appendTo(deckgrid);
 
-		var blocka = $('<div>').addClass('ui-block-a').appendTo(grid);
+		let blocka = $('<div>').addClass('ui-block-a').appendTo(grid);
 		
-		var fieldcontain = $('<div>')
+		let fieldcontain = $('<div>')
 			.attr('data-role', 'fieldcontain')
 			.appendTo(blocka);
 
-		var controlgroup = $('<div>')
+		let controlgroup = $('<div>')
 			.attr('data-role', 'controlgroup')
 			.appendTo(fieldcontain);
 	
-		var args = {
+		let args = {
 			id:'deck'+i,
 			type:'checkbox',
 			change:function() {
@@ -373,17 +373,17 @@ function init() {
 			args.checked = 'checked';
 			createCookie('deck-0', '1');
 		}
-		var input = $('<input>', args).appendTo(controlgroup);
+		let input = $('<input>', args).appendTo(controlgroup);
 		
 	
 		deckCheckboxes.push(input);
-		var label = $('<label>', {text:deck.name})
+		let label = $('<label>', {text:deck.name})
 			.attr('for', 'deck'+i)
 			.appendTo(controlgroup);
 		input.checkboxradio();
 		input.checkboxradio('refresh');
 		
-		var blockb = $('<div>').addClass('ui-block-b').appendTo(grid);
+		let blockb = $('<div>').addClass('ui-block-b').appendTo(grid);
 
 		$('<a>', {
 			href:'#',
@@ -398,19 +398,19 @@ function init() {
 	});
 
 	//if hand-count exists ...
-	var handCount = readCookie('hand-count');
+	let handCount = readCookie('hand-count');
 	if (handCount != null) {
 		buildCardsFromDecks();
 		handCount = parseInt(handCount);
-		for (var i = 0; i < handCount; i++) {
-			var hand = readCookie('hand-'+i);
-			var split = hand.indexOf('-');
-			var deckIndex = parseInt(hand.substring(0, split));
-			var cardIndex = parseInt(hand.substring(split+1));
+		for (let i = 0; i < handCount; i++) {
+			let hand = readCookie('hand-'+i);
+			let split = hand.indexOf('-');
+			let deckIndex = parseInt(hand.substring(0, split));
+			let cardIndex = parseInt(hand.substring(split+1));
 			//add this card to your hand
-			var index;
+			let index;
 			for (index = 0; index < cardsLeft.length; index++) {
-				var card = cardsLeft[index];
+				let card = cardsLeft[index];
 				if (card == decks[deckIndex].cards[cardIndex]) {
 					cardsUsed.push(cardsLeft.splice(index, 1)[0]);
 					index = undefined;
@@ -433,9 +433,9 @@ function showresults() {
 }
 
 function roll(id) {
-	var src = $('#rollSides'+id);
-	var dst = $('#rollResult'+id);
-	var howmany = parseInt(src.val());
+	let src = $('#rollSides'+id);
+	let dst = $('#rollResult'+id);
+	let howmany = parseInt(src.val());
 	if (howmany != howmany || howmany < 1) {
 		dst.val('???');
 	} else {
