@@ -1,35 +1,10 @@
-function createCookie(name,value,days) {
-	if (days) {
-		let date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
-		let expires = "; expires="+date.toGMTString();
-	}
-	else let expires = "";
-	document.cookie = name+"="+value+expires+"; path=/";
-}
-
-function readCookie(name) {
-	let nameEQ = name + "=";
-	let ca = document.cookie.split(';');
-	for(let i=0;i < ca.length;i++) {
-		let c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-	}
-	return null;
-}
-
-function eraseCookie(name) {
-	createCookie(name,"",-1);
-}
-
 function updateStrike(cardIndex,j) {
 	let id = 'deck'+cardIndex+'card'+j;
 	let strikeName = 'strike-'+cardIndex+'-'+j;
 	if ($('#'+id).attr('checked') == 'checked') {
-		eraseCookie(strikeName);
+		localStorage.removeItem(strikeName);
 	} else {
-		createCookie(strikeName, '1', 100);
+		localStorage.setItem(strikeName, '1');
 	}
 }
 
@@ -42,7 +17,7 @@ function pickRandom() {
 	let i = parseInt(Math.random() * cardsLeft.length);
 	let card = cardsLeft.splice(i, 1)[0];
 	cardsUsed.push(card);
-	updateHandCookies();
+	updateHandStorage();
 	return card;
 }
 
@@ -56,22 +31,22 @@ function cardComparator(a,b) {
 	return 0;
 }
 
-function updateHandCookies() {
-	createCookie('hand-count', cardsUsed.length);
-	$.each(cardsUsed, function(i,card) {
+function updateHandStorage() {
+	localStorage.setItem('hand-count', cardsUsed.length);
+	cardsUsed.forEach((card,i) => {
 		//get the card's index of the deck and the card's index in the deck
 		let deckIndex = decks.indexOf(card.deck);
 		let cardIndex = card.deck.cards.indexOf(card);
-		createCookie('hand-'+i, deckIndex+'-'+cardIndex);
+		localStorage.setItem('hand-'+i, deckIndex+'-'+cardIndex);
 	});
 }
 
 function buildCardsFromDecks() {
 	$('#showresultsbutton').css('display', 'block');
 	let allCards = [];
-	$.each(decks, function(i,deck) {
+	decks.forEach((deck,i) => {
 		if (deckCheckboxes[i].attr('checked') == 'checked') {
-			$.each(deck.cards, function(j,card) {
+			deck.cards.forEach((card,j) => {
 				if ($('#deck'+i+'card'+j).attr('checked') == 'checked') {
 					allCards.push(card);
 				}
@@ -81,13 +56,11 @@ function buildCardsFromDecks() {
 	
 	cardsLeft = allCards.slice(0);
 	cardsUsed = [];
-	//hand-cookies init calls this, so don't update hand cookies here just yet ...
-	//instead do it from any other calling functions (other than hand-cookies init)
 }
 
 function go() {
 	let oneIsChecked = false;
-	$.each(decks, function(i,deck) {
+	decks.forEach((deck,i) => {
 		if (deckCheckboxes[i].attr('checked') == 'checked') {
 			oneIsChecked = true;
 		}
@@ -98,7 +71,7 @@ function go() {
 	}
 	
 	buildCardsFromDecks();
-	updateHandCookies();
+	updateHandStorage();
 
 	let count = parseInt($('#count').val());
 	while (cardsUsed.length < count && cardsLeft.length > 0) {
@@ -113,13 +86,13 @@ function go() {
 let fadeCard;
 function redraw() {
 	cardsUsed.sort(cardComparator);
-	updateHandCookies();
+	updateHandStorage();
 	
 	let content = $('#resultscontent');
 	content.empty();
 
 	let lastDeck = undefined;
-	$.each(cardsUsed, function(i,card) {
+	cardsUsed.forEach((card,i) => {
 		if (card.deck !== lastDeck) {
 			lastDeck = card.deck;
 			
@@ -140,7 +113,7 @@ function redraw() {
 			div.fadeTo(0,0);
 		}
 
-		let a = $('<a>', {
+		$('<a>', {
 			href:'#',
 			text:'Strike',
 			css:{cssFloat:'left'},
@@ -151,7 +124,7 @@ function redraw() {
 				$('#'+id).attr('checked', false).checkboxradio().checkboxradio('refresh');
 				updateStrike(deckIndex,cardIndex);
 				cardsUsed.splice(i,1);
-				updateHandCookies();
+				updateHandStorage();
 				redraw();
 			}
 		}).attr('data-role', 'button')
@@ -159,13 +132,13 @@ function redraw() {
 			.button()
 			.appendTo(div);
 
-		let a = $('<a>', {
+		$('<a>', {
 			href:'#',
 			text:'Veto',
 			css:{cssFloat:'left'},
 			click:function() {
 				cardsUsed.splice(i,1);
-				updateHandCookies();
+				updateHandStorage();
 				div.fadeTo(300, 0, function() {
 					redraw();
 				});
@@ -175,13 +148,13 @@ function redraw() {
 			.button()
 			.appendTo(div);
 	
-		let a = $('<a>', {
+		$('<a>', {
 			href:'#',
 			text:'Reroll',
 			css:{cssFloat:'left'},
 			click:function() {
 				cardsLeft.push(cardsUsed.splice(i,1)[0]);
-				updateHandCookies();
+				updateHandStorage();
 				fadeCard = pickRandom();
 				redraw();
 			}
@@ -200,7 +173,7 @@ function redraw() {
 		if (card == fadeCard) { div.fadeTo(300, 1); }
 	});
 	
-	let a = $('<a>', {
+	$('<a>', {
 		href:'#',
 		text:'Roll Again',
 		click:function() {
@@ -208,7 +181,7 @@ function redraw() {
 		}
 	}).attr('data-role', 'button').button().appendTo(content);
 	
-	let a = $('<a>', {
+	$('<a>', {
 		href:'#',
 		text:'Add Card',
 		click:function() {
@@ -217,11 +190,11 @@ function redraw() {
 		}
 	}).attr('data-role', 'button').button().appendTo(content);
 	
-	let a = $('<a>', {
+	$('<a>', {
 		href:'#',
 		text:'Strike All',
 		click:function() {
-			$.each(cardsUsed, function(i,card) {
+			cardsUsed.forEach((card,i) => {
 				let deckIndex = decks.indexOf(card.deck);
 				let cardIndex = card.deck.cards.indexOf(card);
 				let id = 'deck'+deckIndex+'card'+cardIndex;
@@ -232,7 +205,7 @@ function redraw() {
 		}
 	}).attr('data-role', 'button').button().appendTo(content);
 	
-	let a = $('<a>', {
+	$('<a>', {
 		href:'#',
 		text:'Back',
 		click:function() {
@@ -247,9 +220,9 @@ function reset() {
 	$('#showresultsbutton').hide();
 	cardsUsed = [];
 	//allCards still needs to be updated ...
-	updateHandCookies();
-	$.each(decks, function(deckIndex, deck) {
-		$.each(deck.cards, function(cardIndex, card) {
+	updateHandStorage();
+	decks.forEach((deck,deckIndex) => {
+		deck.cards.forEach((card,cardIndex) => {
 			let id = 'deck'+deckIndex+'card'+cardIndex;
 			$('#'+id).attr('checked', 'checked').checkboxradio().checkboxradio('refresh');
 			updateStrike(deckIndex, cardIndex);
@@ -262,7 +235,7 @@ function init() {
 	(function(){
 		let helpback = 'deckpage';
 		let helpbacks = ['deckpage', 'resultspage'];
-		$.each(['#deck-help', '#results-help'], function(i,id) {
+		['#deck-help', '#results-help'].forEach((id,i) => {
 			let _back = helpbacks[i];
 			$(id).click(function() {
 				$.mobile.changePage('#helppage');
@@ -276,27 +249,27 @@ function init() {
 
 	let deckgrid = $('#deckgrid');
 
-	let initialized = readCookie('initialized');
-	createCookie('initialized', '1');
+	let initialized = localStorage.getItem('initialized');
+	localStorage.setItem('initialized', '1');
 
 	$('#count')
 		.on('input', function() {
-			createCookie('count', $('#count').val());
+			localStorage.setItem('count', $('#count').val());
 		});
-	let count = readCookie('count');
+	let count = localStorage.getItem('count');
 	if (count != null) {
 		$('#count').val(count);
 	}
 
-	$.each(decks, function(i,deck) {
+	decks.forEach((deck,i) => {
 		deck.cards.sort(cardComparator);
 		
-		$.each(deck.cards, function(j,card) {
+		deck.cards.forEach((card,j) => {
 			card.deck = deck;
 		});
 	});
 
-	$.each(decks, function(i,deck) {
+	decks.forEach((deck,i) => {
 		//page
 
 		let page = $('<div>', {id:'deck'+i})
@@ -308,11 +281,11 @@ function init() {
 		
 		let content = $('<div>').attr('data-role', 'content').appendTo(page);
 
-		let a = $('<a>', {
+		$('<a>', {
 			href:'#',
 			text:'Check All',
 			click:function() {
-				$.each(deck.cards, function(j,card) {
+				deck.cards.forEach((card,j) => {
 					$('#deck'+i+'card'+j).attr('checked', 'checked').checkboxradio('refresh');
 					updateStrike(i,j);
 				});
@@ -320,7 +293,7 @@ function init() {
 		}).attr('data-role', 'button').button().appendTo(content);
 		
 		
-		$.each(deck.cards, function(j,card) {
+		deck.cards.forEach((card,j) => {
 			let fieldcontain = $('<div>').attr('data-role', 'fieldcontain').appendTo(content);
 			let controlgroup = $('<div>').attr('data-role', 'controlgroup').appendTo(fieldcontain);
 			let id = 'deck'+i+'card'+j;
@@ -330,7 +303,7 @@ function init() {
 				type:'checkbox',
 				change:function() { updateStrike(i,j); }
 			};
-			if (readCookie(strikeName) === null) args.checked = 'checked'; 
+			if (localStorage.getItem(strikeName) === null) args.checked = 'checked'; 
 			let input = $('<input>', args).appendTo(controlgroup);
 			let label = $('<label>', {text:card.name}).attr('for', id).appendTo(controlgroup);
 		});
@@ -362,16 +335,16 @@ function init() {
 			type:'checkbox',
 			change:function() {
 				if ($('#deck'+i).attr('checked') == 'checked') {
-					createCookie('deck-'+i, '1');
+					localStorage.setItem('deck-'+i, '1');
 				} else {
-					eraseCookie('deck-'+i);
+					localStorage.removeItem('deck-'+i);
 				}
 			}
 		};
-		if (readCookie('deck-'+i) != null) args.checked = 'checked'
+		if (localStorage.getItem('deck-'+i) != null) args.checked = 'checked'
 		if (!initialized && i == 0) {
 			args.checked = 'checked';
-			createCookie('deck-0', '1');
+			localStorage.setItem('deck-0', '1');
 		}
 		let input = $('<input>', args).appendTo(controlgroup);
 		
@@ -398,12 +371,12 @@ function init() {
 	});
 
 	//if hand-count exists ...
-	let handCount = readCookie('hand-count');
+	let handCount = localStorage.getItem('hand-count');
 	if (handCount != null) {
 		buildCardsFromDecks();
 		handCount = parseInt(handCount);
 		for (let i = 0; i < handCount; i++) {
-			let hand = readCookie('hand-'+i);
+			let hand = localStorage.getItem('hand-'+i);
 			let split = hand.indexOf('-');
 			let deckIndex = parseInt(hand.substring(0, split));
 			let cardIndex = parseInt(hand.substring(split+1));
@@ -420,7 +393,7 @@ function init() {
 			//how could this happen?  if the user had a hand from another deck and then unchecks the deck ...
 			if (index !== undefined) console.warn("failed to find prior card");
 		}
-		updateHandCookies();	//incase a card wasn't found
+		updateHandStorage();	//incase a card wasn't found
 		$.mobile.changePage('#resultspage');
 		fadeCard = undefined;
 		redraw();
