@@ -1586,11 +1586,6 @@ decks = [{
         "cost":"$5",
         "text":"Choose one: +3 Cards and add 1 VP to the Wild Hunt Supply pile; or gain an Estate, and if you do, take the VP from the pile."
       },{
-        "name":"King's Castle",
-        "type":"Victory - Castle",
-        "cost":"$10",
-        "text":"Worth 2 VP per Castle you have."
-      },{
         "name":"Advance",
         "type":"Event",
         "cost":"$0",
